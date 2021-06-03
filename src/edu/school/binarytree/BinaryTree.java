@@ -32,10 +32,36 @@ class Node<T extends Comparable<T>>
 		return right;
 	}
 	
+	private int getLeftSubtreeDepth()
+	{
+		if(left == null)
+			return 0;
+		int l = left.getLeftSubtreeDepth();
+		int r = left.getRightSubtreeDepth();
+		
+		if(l > r) return l+1;
+		return r+1;
+	}
+	
+	private int getRightSubtreeDepth()
+	{
+		if(right == null)
+			return 0;
+		int l = right.getLeftSubtreeDepth();
+		int r = right.getRightSubtreeDepth();
+		
+		if(l > r) return l+1;
+		return r+1;
+	}
+	
+	public int getBalance()
+	{
+		return getRightSubtreeDepth() - getLeftSubtreeDepth();
+	}
 	/*Node(T data, Node<T> left, Node<T> right)
 	{
 		this.data = data;
-		if(left == null && right == null)
+		if(left == nu2ll && right == null)
 		{
 			this.left = left;
 			this.right = right;
