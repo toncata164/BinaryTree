@@ -32,6 +32,8 @@ class Node<T extends Comparable<T>>
 		return right;
 	}
 	
+	
+	/*
 	private int getLeftSubtreeDepth()
 	{
 		if(left == null)
@@ -52,12 +54,8 @@ class Node<T extends Comparable<T>>
 		
 		if(l > r) return l+1;
 		return r+1;
-	}
+	}*/
 	
-	public int getBalance()
-	{
-		return getRightSubtreeDepth() - getLeftSubtreeDepth();
-	}
 	/*Node(T data, Node<T> left, Node<T> right)
 	{
 		this.data = data;
@@ -92,24 +90,83 @@ public class BinaryTree <T extends Comparable<T>> {
 		root = null;
 	}
 	
+	private int getDepth(Node<T> current)
+	{
+		if(current == null)
+			return 0;
+		int leftDepth = getDepth(current.getLeft());
+		int rightDepth = getDepth(current.getRight());
+		if(leftDepth > rightDepth)
+			return leftDepth+1;
+		return rightDepth+1;
+	}
+	
+	private int getBalance(Node<T> current)
+	{
+		if(current == null)
+			return 0;
+		int leftDepth = getDepth(current.getLeft());
+		int rightDepth = getDepth(current.getRight());
+		return rightDepth - leftDepth;
+	}
+	
 	private void rotateRight(Node<T> disbalanced)
 	{
 		Node<T> parent = getParentOf(disbalanced.getData());
+		Node<T> left = disbalanced.getLeft();
+		Node<T> leftRight = left.getRight();
 		//kogato e koren
 		if(parent == null)
 		{
-			
+			root = left;
+			root.setRight(disbalanced);
+			disbalanced.setLeft(leftRight);
 		}
 		//kogato ne e koren
 		else
 		{
-			Node<T> left = disbalanced.getLeft();
-			Node<T> leftRight = left.getRight();
+			
 			if(parent.getLeft() == disbalanced)
 			{
 				parent.setLeft(left);
 				left.setRight(disbalanced);
-				disbalanced.setLeft(leftRight);
+			}
+			if(parent.getRight() == disbalanced) 
+			{
+				parent.setRight(left);
+				parent.getRight().setRight(disbalanced);
+			}
+			disbalanced.setLeft(leftRight);
+		}
+	}
+	
+	private void rotateLeft(Node<T> disbalanced)
+	{
+		Node<T> parent = getParentOf(disbalanced.getData());
+		//kogato e koren
+		Node<T> right = disbalanced.getRight();
+		Node<T> rightLeft = right.getLeft();
+		if(parent == null)
+		{
+			root = right;
+			root.setLeft(disbalanced);
+			disbalanced.setRight(rightLeft);
+		}
+		//kogato ne e koren
+		else
+		{
+			
+			if(parent.getRight() == disbalanced)
+			{
+				parent.setRight(right);
+				right.setLeft(disbalanced);
+				disbalanced.setRight(rightLeft);
+			}
+			if(parent.getLeft() == disbalanced)
+			{
+				parent.setLeft(right);
+				parent.getLeft().setLeft(disbalanced);
+				disbalanced.setRight(rightLeft);
 			}
 		}
 	}
@@ -139,7 +196,35 @@ public class BinaryTree <T extends Comparable<T>> {
 			else
 			{
 				add(data, current.getLeft());
-				
+				int balance = getBalance(current);
+				if(balance < -1 || balance > 1)
+				{
+					System.out.println();
+				}
+				if(balance == -2)
+				{
+					if(getBalance(current.getLeft()) == -1)
+					{
+						rotateRight(current);
+					}
+					if(getBalance(current.getLeft()) == 1)
+					{
+						rotateLeft(current.getLeft());
+						rotateRight(current);
+					}
+				}
+				if(balance == 2)
+				{
+					if(getBalance(current.getRight()) == 1)
+					{
+						rotateLeft(current);
+					}
+					if(getBalance(current.getRight())==-1)
+					{
+						rotateRight(current.getRight());
+						rotateLeft(current);
+					}
+				}
 			}
 		}
 		else if(data.compareTo(current.getData()) > 0)
@@ -151,6 +236,35 @@ public class BinaryTree <T extends Comparable<T>> {
 			else
 			{
 				add(data, current.getRight());
+				int balance = getBalance(current);
+				if(balance < -1 || balance > 1)
+				{
+					System.out.println();
+				}
+				if(balance == -2)
+				{
+					if(getBalance(current.getLeft()) == -1)
+					{
+						rotateRight(current);
+					}
+					if(getBalance(current.getLeft()) == 1)
+					{
+						rotateLeft(current.getLeft());
+						rotateRight(current);
+					}
+				}
+				if(balance == 2)
+				{
+					if(getBalance(current.getRight()) == 1)
+					{
+						rotateLeft(current);
+					}
+					if(getBalance(current.getRight())==-1)
+					{
+						rotateRight(current.getRight());
+						rotateLeft(current);
+					}
+				}
 			}
 		}
 	}
@@ -299,7 +413,7 @@ public class BinaryTree <T extends Comparable<T>> {
 		if(current == null)
 			return;
 		print(current.getLeft());
-		System.out.print(current.getData()+" ");
+		System.out.print(current.getData()+" "+getBalance(current)+"\n");
 		print(current.getRight());
 	}
 }
